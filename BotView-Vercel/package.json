@@ -1,0 +1,13 @@
+{
+  "name": "botview-vercel",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Minimalny klient WWW dla własnego bota Discord, bez osobnego serwera.",
+  "scripts": {
+    "test": "node --test tests/*.test.js",
+    "check": "node --check app.js && node --check api/discord.js",
+    "start": "node local-dev.mjs"
+  },
+  "engines": { "node": ">=20" }
+}

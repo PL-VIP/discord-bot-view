@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#232428" />
+  <meta name="description" content="Webowy panel dla własnego bota Discord — serwery, kanały i wiadomości." />
+  <title>BotView — webowy klient bota</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="stylesheet" href="/styles.css" />
+  <script src="/app.js" type="module" defer></script>
+</head>
+<body>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <main id="loginScreen" class="login-screen">
+    <div class="login-glow"></div>
+    <div class="login-card">
+      <div class="brand-big"><span class="brand-logo">◈</span> BotView <span class="brand-tag">WEB</span></div>
+      <h1>Twój bot. Twoja perspektywa.</h1>
+      <p class="login-lead">Przeglądaj serwery, kanały i wiadomości dostępne dla Twojego bota — w przeglądarce, bez Electrona.</p>
+      <form id="loginForm">
+        <label for="tokenInput">TOKEN TWOJEGO BOTA</label>
+        <div class="token-field"><input id="tokenInput" type="password" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Wklej token własnego bota" required minlength="25" /><button id="toggleToken" type="button" aria-label="Pokaż lub ukryj token" title="Pokaż/ukryj token">◉</button></div>
+        <button class="btn-primary" id="loginButton" type="submit">Połącz z Discord API <span aria-hidden="true">→</span></button>
+      </form>
+      <div id="loginError" class="form-error" role="alert" hidden></div>
+      <div class="login-notice"><span class="notice-icon">⌁</span><div><strong>Tylko własny bot i własne wdrożenie.</strong><p>Token nie jest zapisywany w localStorage, cookies ani bazie. Jest przekazywany do funkcji API Twojego wdrożenia podczas aktywnej sesji. Nie wklejaj go na stronę, której właścicielowi nie ufasz.</p></div></div>
+      <p class="login-footer">Nieoficjalny projekt · nie jest produktem Discorda</p>
+    </div>
+  </main>
+
+  <div id="appShell" class="app-shell" hidden>
+    <aside class="guild-rail" aria-label="Serwery">
+      <button class="rail-home" title="BotView" id="homeButton">◈</button>
+      <div class="rail-divider"></div>
+      <div id="guildIcons" class="guild-icons"></div>
+      <div class="rail-bottom"><button id="reloadGuilds" class="rail-small" title="Odśwież serwery">↻</button><button id="logoutButton" class="rail-small logout" title="Rozłącz bota">⎋</button></div>
+    </aside>
+
+    <aside class="channels-panel" id="channelsPanel" aria-label="Kanały">
+      <div class="server-title"><span id="serverTitle">Wybierz serwer</span><span class="server-chevron">⌄</span></div>
+      <div class="channel-search-box"><span>⌕</span><input id="channelSearch" type="search" placeholder="Znajdź kanał…" aria-label="Filtruj kanały" /></div>
+      <div class="channels-scroll" id="channelsList"><p class="sidebar-placeholder">Wybierz serwer po lewej stronie.</p></div>
+      <div class="user-widget"><div id="botAvatarMini" class="user-avatar">B</div><div class="user-info"><strong id="botName">Bot</strong><small><span class="online-dot"></span> Połączony</small></div><button id="logoutSide" class="widget-action" title="Wyloguj">⎋</button></div>
+    </aside>
+
+    <section class="chat-panel" aria-label="Wiadomości">
+      <header class="chat-header">
+        <button class="mobile-menu" id="mobileMenu" title="Pokaż kanały" aria-label="Pokaż kanały">☰</button>
+        <div class="channel-heading"><span id="headerIcon" class="heading-hash">#</span><strong id="chatTitle">Wybierz kanał</strong><span id="chatTopic" class="chat-topic"></span></div>
+        <div class="header-actions"><button id="refreshMessages" title="Odśwież wiadomości" aria-label="Odśwież wiadomości">↻</button><span class="header-sep"></span><span id="connectionBadge" class="connection-badge">● REST API</span></div>
+      </header>
+
+      <div id="welcomePanel" class="welcome-panel"><div class="welcome-symbol">◈</div><h2>Witaj w BotView</h2><p>Wybierz serwer, a potem kanał, aby przeglądać wiadomości widoczne dla bota.</p><div class="welcome-chips"><span>Serwery</span><span>Kanały</span><span>Wiadomości</span></div></div>
+      <div id="chatView" class="chat-view" hidden>
+        <div id="chatInfo" class="chat-info" hidden></div>
+        <div id="messagesScroller" class="messages-scroller">
+          <div class="load-older"><button id="olderButton" type="button" hidden>↑ Wczytaj starsze wiadomości</button></div>
+          <div id="messageList" class="message-list"></div>
+        </div>
+        <form id="composerForm" class="composer"><div class="composer-shell"><textarea id="composerInput" rows="1" maxlength="2000" placeholder="Napisz jako bot..." aria-label="Treść wiadomości"></textarea><button id="sendButton" type="submit" title="Wyślij wiadomość" aria-label="Wyślij wiadomość">➤</button></div><div id="composerHint" class="composer-hint">Enter – wyślij · Shift+Enter – nowa linia · Odświeżanie co 20 s</div></form>
+      </div>
+    </section>
+  </div>
+</body>
+</html>
