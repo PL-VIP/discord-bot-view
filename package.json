@@ -7,7 +7,8 @@
   "scripts": {
     "test": "node --test tests/*.test.js",
     "check": "node --check app.js && node --check api/discord.js",
-    "start": "node local-dev.mjs"
+    "start": "node local-dev.mjs",
+    "preview:mock": "node tests/mock-preview.mjs"
   },
   "engines": { "node": ">=20" }
 }

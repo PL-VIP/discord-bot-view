@@ -10,8 +10,19 @@ Gotowa aplikacja WWW w **HTML/CSS/JavaScript + Node.js (Vercel Functions)**. Bra
 - Lista serwerów, do których dodano bota (endpoint `GET /users/@me/guilds`).
 - Lista kanałów po obliczeniu widoczności na podstawie ról i nadpisań uprawnień.
 - Odczyt ostatnich 50 wiadomości i ładowanie wcześniejszych (przycisk nad czatem).
-- Załączniki, obrazy, proste embedy i reakcje (podgląd).
-- Wysyłanie zwykłych wiadomości, gdy bot ma odpowiednie uprawnienia; wzmianki masowe są wyłączone.
+- Załączniki i obrazy: podgląd oraz wysyłanie plików do 2,5 MB.
+- Wysyłanie zwykłych wiadomości i embedów z kreatora; wzmianki masowe są wyłączone.
+- Odpowiadanie na wiadomości z podglądem cytowanej treści (bez automatycznego pingowania autora).
+- Edycja wiadomości wysłanych przez bota, pojedyncze i masowe usuwanie oraz zaznaczanie wiadomości.
+- Dodawanie i usuwanie własnych reakcji, przypinanie/odpinanie oraz widok przypiętych wiadomości.
+- Wyszukiwanie w załadowanej historii i filtrowanie wiadomości według autora.
+- Menu kontekstowe wiadomości: odpowiedź, reakcja, przypięcie, edycja, zaznaczenie, kopiowanie treści/ID/linku i usuwanie.
+- Otwieranie rozmów DM po ID użytkownika; otwarte rozmowy są pamiętane do końca sesji karty.
+- Tworzenie, edycja i usuwanie kanałów tekstowych oraz kategorii; nazwa, temat, slowmode, NSFW i kategoria nadrzędna.
+- Tworzenie publicznych wątków, lista aktywnych wątków i ich archiwizacja.
+- Panel użytkownika z rolami, ID, szybkim DM oraz moderacją: timeout, wyrzucenie i ban.
+- Diagnostyka uprawnień bota dla bieżącego kanału.
+- Licznik nowych wiadomości, przycisk skoku na dół i szkice zapamiętywane w pamięci bieżącej karty.
 - Odświeżanie wiadomości co 20 sekund podczas aktywności karty i ręcznie (przycisk `↻`).
 - Widok mobilny i wyszukiwarka kanałów (`Ctrl+K`).
 
@@ -43,6 +54,8 @@ npm test
 
 Testy nie wymagają rzeczywistego tokenu Discorda ani połączenia z Discordem.
 
+Pełny interfejs można obejrzeć na lokalnych danych demonstracyjnych poleceniem `npm run preview:mock` i adresem `http://localhost:3001`.
+
 ## Uprawnienia bota
 
 Bot musi być dodany do serwera. Aby widzieć treść wiadomości, potrzebuje `View Channel` i `Read Message History` oraz dostępu do treści wiadomości zgodnie z aktualnymi zasadami Discorda, w tym włączonego `Message Content Intent`, jeśli jest wymagane i dostępne dla Twojego bota.
@@ -51,9 +64,11 @@ Jeśli treść wiadomości jest pusta, może to być ograniczenie `Message Conte
 
 ## Ograniczenia
 
-- To **nie jest** pełny Discord Web / dokładny port DiscordBotClient: brak rozmów głosowych, wideorozmów, prywatnych DM, aktywnych wątków z listy, moderacji, edycji i reakcji na wiadomości, nagrywania czy pluginów.
+- To **nie jest** pełny Discord Web / dokładny port DiscordBotClient: brak rozmów głosowych, wideorozmów, nagrywania, pluginów i pełnego panelu administracyjnego serwera.
+- Discord nie udostępnia botom wygodnej listy wszystkich historycznych DM w tym modelu REST, dlatego rozmowę otwiera się po ID użytkownika i lista istnieje tylko w bieżącej sesji.
 - Brak stałego połączenia Gateway / WebSocket. Odświeżanie jest przez REST co 20 s, co pozwala wdrożyć wszystko wyłącznie na Vercel bez ciągle uruchomionego serwera.
-- Wątki forum/media nie są wyświetlane jako lista postów. Kanały głosowe są widoczne, ale to nie jest klient voice.
+- Zwykłe aktywne wątki są obsługiwane, ale zarchiwizowane wątki i posty forum/media nie mają osobnej przeglądarki. Kanały głosowe są widoczne, ale to nie jest klient voice.
+- Limit załącznika w BotView wynosi 2,5 MB ze względu na limit rozmiaru żądania funkcji serverless; natywny Discord może pozwalać na większe pliki.
 - Endpoint listy serwerów pokazuje maksymalnie 200 pozycji na żądanie; bardzo duże boty z shardingiem mogą wymagać rozszerzenia.
 - Niektóre funkcje API mogą podlegać dodatkowym limitom lub wymaganiom Discorda.
 - Zaprojektowany na jeden token w jednej karcie; po odświeżeniu trzeba wkleić token ponownie.

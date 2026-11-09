@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="pl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#232428" />
+  <meta name="description" content="Webowy panel dla własnego bota Discord — serwery, kanały i wiadomości." />
+  <title>BotView — webowy klient bota</title>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="stylesheet" href="/styles.css" />
+  <script src="/app.js" type="module" defer></script>
+</head>
+<body>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <main id="loginScreen" class="login-screen">
+    <div class="login-glow"></div>
+    <div class="login-card">
+      <div class="brand-big"><span class="brand-logo">◈</span> BotView <span class="brand-tag">WEB</span></div>
+      <h1>Twój bot. Twoja perspektywa.</h1>
+      <p class="login-lead">Przeglądaj serwery, kanały i wiadomości dostępne dla Twojego bota — w przeglądarce, bez Electrona.</p>
+      <form id="loginForm">
+        <label for="tokenInput">TOKEN TWOJEGO BOTA</label>
+        <div class="token-field"><input id="tokenInput" type="password" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="Wklej token własnego bota" required minlength="25" /><button id="toggleToken" type="button" aria-label="Pokaż lub ukryj token" title="Pokaż/ukryj token">◉</button></div>
+        <button class="btn-primary" id="loginButton" type="submit">Połącz z Discord API <span aria-hidden="true">→</span></button>
+      </form>
+      <div id="loginError" class="form-error" role="alert" hidden></div>
+      <div class="login-notice"><span class="notice-icon">⌁</span><div><strong>Tylko własny bot i własne wdrożenie.</strong><p>Token nie jest zapisywany w localStorage, cookies ani bazie. Jest przekazywany do funkcji API Twojego wdrożenia podczas aktywnej sesji. Nie wklejaj go na stronę, której właścicielowi nie ufasz.</p></div></div>
+      <p class="login-footer">Nieoficjalny projekt · nie jest produktem Discorda</p>
+    </div>
+  </main>
+
+  <div id="appShell" class="app-shell" hidden>
+    <aside class="guild-rail" aria-label="Serwery">
+      <button class="rail-home" title="BotView" id="homeButton">◈</button>
+      <div class="rail-divider"></div>
+      <button class="rail-dm" title="Otwórz wiadomość prywatną" id="dmButton" aria-label="Otwórz wiadomość prywatną">✉</button>
+      <div id="guildIcons" class="guild-icons"></div>
+      <div class="rail-bottom"><button id="reloadGuilds" class="rail-small" title="Odśwież serwery">↻</button><button id="logoutButton" class="rail-small logout" title="Rozłącz bota">⎋</button></div>
+    </aside>
+
+    <aside class="channels-panel" id="channelsPanel" aria-label="Kanały">
+      <div class="server-title"><span id="serverTitle">Wybierz serwer</span><div class="server-actions"><button id="openDmButton" type="button" title="Nowa wiadomość prywatna" aria-label="Nowa wiadomość prywatna">✉</button><button id="createChannelButton" type="button" title="Utwórz kanał" aria-label="Utwórz kanał" hidden>+</button></div></div>
+      <div class="channel-search-box"><span>⌕</span><input id="channelSearch" type="search" placeholder="Znajdź kanał…" aria-label="Filtruj kanały" /></div>
+      <div class="channels-scroll" id="channelsList"><p class="sidebar-placeholder">Wybierz serwer po lewej stronie.</p></div>
+      <div class="user-widget"><div id="botAvatarMini" class="user-avatar">B</div><div class="user-info"><strong id="botName">Bot</strong><small><span class="online-dot"></span> Połączony</small></div><button id="logoutSide" class="widget-action" title="Wyloguj">⎋</button></div>
+    </aside>
+
+    <section class="chat-panel" aria-label="Wiadomości">
+      <header class="chat-header">
+        <button class="mobile-menu" id="mobileMenu" title="Pokaż kanały" aria-label="Pokaż kanały">☰</button>
+        <div class="channel-heading"><span id="headerIcon" class="heading-hash">#</span><strong id="chatTitle">Wybierz kanał</strong><span id="chatTopic" class="chat-topic"></span></div>
+        <div class="header-actions"><button id="searchMessagesButton" title="Szukaj w wiadomościach" aria-label="Szukaj w wiadomościach" hidden>⌕</button><button id="pinsButton" title="Przypięte wiadomości" aria-label="Przypięte wiadomości" hidden>⌖</button><button id="permissionsButton" title="Uprawnienia bota" aria-label="Uprawnienia bota" hidden>ⓘ</button><button id="threadButton" title="Utwórz wątek" aria-label="Utwórz wątek" hidden>◫</button><button id="editChannelButton" title="Edytuj kanał" aria-label="Edytuj kanał" hidden>⚙</button><button id="archiveThreadButton" title="Archiwizuj wątek" aria-label="Archiwizuj wątek" hidden>✓</button><button id="deleteChannelButton" class="danger-action" title="Usuń kanał" aria-label="Usuń kanał" hidden>⌫</button><button id="refreshMessages" title="Odśwież wiadomości" aria-label="Odśwież wiadomości">↻</button><span class="header-sep"></span><span id="connectionBadge" class="connection-badge">● REST API</span></div>
+      </header>
+
+      <div id="welcomePanel" class="welcome-panel"><div class="welcome-symbol">◈</div><h2>Witaj w BotView</h2><p>Wybierz serwer, a potem kanał, aby przeglądać wiadomości widoczne dla bota.</p><div class="welcome-chips"><span>Serwery</span><span>Kanały</span><span>Wiadomości</span></div></div>
+      <div id="chatView" class="chat-view" hidden>
+        <div id="chatInfo" class="chat-info" hidden></div>
+        <div id="messageSearchBar" class="message-search-bar" hidden><span>⌕</span><input id="messageSearchInput" type="search" placeholder="Szukaj w załadowanych wiadomościach…" /><select id="messageAuthorFilter" aria-label="Filtruj według autora"><option value="">Wszyscy autorzy</option></select><button id="closeMessageSearch" type="button" aria-label="Zamknij wyszukiwanie">×</button></div>
+        <div id="messagesScroller" class="messages-scroller">
+          <div class="load-older"><button id="olderButton" type="button" hidden>↑ Wczytaj starsze wiadomości</button></div>
+          <div id="messageList" class="message-list"></div>
+        </div>
+        <button id="newMessagesButton" class="new-messages-button" type="button" hidden>Nowe wiadomości <span id="newMessagesCount">0</span> ↓</button>
+        <div id="bulkBar" class="bulk-bar" hidden><strong><span id="bulkCount">0</span> zaznaczonych</strong><span>Tylko wiadomości młodsze niż 14 dni</span><button id="cancelBulk" type="button">Anuluj</button><button id="deleteBulk" class="danger-button" type="button">Usuń zaznaczone</button></div>
+        <form id="composerForm" class="composer"><div id="composerContext" class="composer-context" hidden><div><strong id="composerContextTitle"></strong><span id="composerContextText"></span></div><button id="cancelComposerContext" type="button" title="Anuluj" aria-label="Anuluj">×</button></div><div id="attachmentPreview" class="attachment-preview" hidden><span id="attachmentName"></span><small id="attachmentSize"></small><button id="removeAttachment" type="button" aria-label="Usuń załącznik">×</button></div><div class="composer-shell"><button id="attachButton" type="button" title="Dodaj plik" aria-label="Dodaj plik">+</button><input id="fileInput" type="file" hidden /><button id="embedButton" type="button" title="Kreator embedu" aria-label="Kreator embedu">▤</button><textarea id="composerInput" rows="1" maxlength="2000" placeholder="Napisz jako bot..." aria-label="Treść wiadomości"></textarea><button id="sendButton" type="submit" title="Wyślij wiadomość" aria-label="Wyślij wiadomość">➤</button></div><div id="composerHint" class="composer-hint">Enter – wyślij · Shift+Enter – nowa linia · pliki do 2,5 MB · odświeżanie co 20 s</div></form>
+      </div>
+    </section>
+  </div>
+
+  <dialog id="dmDialog" class="action-dialog">
+    <form id="dmForm" method="dialog">
+      <div class="dialog-heading"><div><h2>Nowa wiadomość prywatna</h2><p>Podaj ID użytkownika, który ma otrzymać wiadomość od bota.</p></div><button class="dialog-close" value="cancel" aria-label="Zamknij">×</button></div>
+      <label for="dmUserId">ID UŻYTKOWNIKA</label>
+      <input id="dmUserId" name="userId" inputmode="numeric" pattern="[0-9]{15,22}" minlength="15" maxlength="22" placeholder="123456789012345678" required />
+      <p class="dialog-note">Discord zaleca otwieranie DM tylko w odpowiedzi na działanie użytkownika. Nie używaj tej funkcji do masowych wiadomości.</p>
+      <div class="dialog-buttons"><button class="btn-secondary" value="cancel">Anuluj</button><button class="btn-primary dialog-primary" id="openDmSubmit" value="default">Otwórz DM</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="channelDialog" class="action-dialog">
+    <form id="channelForm" method="dialog">
+      <div class="dialog-heading"><div><h2>Utwórz kanał</h2><p>Nowy kanał zostanie utworzony na aktualnym serwerze.</p></div><button class="dialog-close" value="cancel" aria-label="Zamknij">×</button></div>
+      <label for="channelName">NAZWA</label>
+      <input id="channelName" name="name" maxlength="100" placeholder="nowy-kanał" required />
+      <label for="channelType">TYP KANAŁU</label>
+      <select id="channelType" name="type"><option value="0">Kanał tekstowy</option><option value="4">Kategoria</option></select>
+      <div id="channelParentField"><label for="channelParent">KATEGORIA</label><select id="channelParent" name="parentId"><option value="">Bez kategorii</option></select></div>
+      <div id="channelTopicField"><label for="channelTopicInput">TEMAT (OPCJONALNIE)</label><input id="channelTopicInput" name="topic" maxlength="1024" placeholder="O czym jest ten kanał?" /></div>
+      <div class="dialog-buttons"><button class="btn-secondary" value="cancel">Anuluj</button><button class="btn-primary dialog-primary" id="createChannelSubmit" value="default">Utwórz kanał</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="editChannelDialog" class="action-dialog"><form id="editChannelForm" method="dialog"><div class="dialog-heading"><div><h2>Edytuj kanał</h2><p>Zmień podstawowe ustawienia kanału tekstowego.</p></div><button class="dialog-close" value="cancel" aria-label="Zamknij">×</button></div><label for="editChannelName">NAZWA</label><input id="editChannelName" maxlength="100" required /><label for="editChannelTopic">TEMAT</label><input id="editChannelTopic" maxlength="1024" /><label for="editChannelParent">KATEGORIA</label><select id="editChannelParent"><option value="">Bez kategorii</option></select><label for="editChannelSlowmode">SLOWMODE</label><select id="editChannelSlowmode"><option value="0">Wyłączony</option><option value="5">5 sekund</option><option value="10">10 sekund</option><option value="30">30 sekund</option><option value="60">1 minuta</option><option value="300">5 minut</option><option value="3600">1 godzina</option></select><label class="check-label"><input id="editChannelNsfw" type="checkbox" /> Kanał NSFW</label><div class="dialog-buttons"><button class="btn-secondary" value="cancel">Anuluj</button><button class="btn-primary dialog-primary" id="editChannelSubmit" value="default">Zapisz</button></div></form></dialog>
+
+  <dialog id="threadDialog" class="action-dialog"><form id="threadForm" method="dialog"><div class="dialog-heading"><div><h2>Nowy wątek</h2><p>Utwórz publiczny wątek w bieżącym kanale.</p></div><button class="dialog-close" value="cancel" aria-label="Zamknij">×</button></div><label for="threadName">NAZWA</label><input id="threadName" maxlength="100" required /><label for="threadDuration">AUTOMATYCZNA ARCHIWIZACJA</label><select id="threadDuration"><option value="60">Po godzinie</option><option value="1440">Po 24 godzinach</option><option value="4320">Po 3 dniach</option><option value="10080">Po 7 dniach</option></select><div class="dialog-buttons"><button class="btn-secondary" value="cancel">Anuluj</button><button class="btn-primary dialog-primary" id="threadSubmit" value="default">Utwórz wątek</button></div></form></dialog>
+
+  <dialog id="embedDialog" class="action-dialog"><form id="embedForm" method="dialog"><div class="dialog-heading"><div><h2>Kreator embedu</h2><p>Zbuduj czytelną wiadomość z kolorem i odnośnikiem.</p></div><button class="dialog-close" value="cancel" aria-label="Zamknij">×</button></div><label for="embedTitle">TYTUŁ</label><input id="embedTitle" maxlength="256" /><label for="embedDescription">OPIS</label><textarea id="embedDescription" maxlength="4096" rows="5"></textarea><div class="dialog-grid"><div><label for="embedColor">KOLOR</label><input id="embedColor" type="color" value="#5865f2" /></div><div><label for="embedUrl">LINK HTTPS</label><input id="embedUrl" type="url" placeholder="https://..." /></div></div><div id="embedPreview" class="embed-preview"></div><div class="dialog-buttons"><button class="btn-secondary" value="cancel">Anuluj</button><button class="btn-primary dialog-primary" id="embedSubmit" value="default">Wyślij embed</button></div></form></dialog>
+
+  <dialog id="pinsDialog" class="action-dialog wide-dialog"><div class="dialog-heading sticky-heading"><div><h2>Przypięte wiadomości</h2><p>Do 50 najnowszych przypiętych wiadomości.</p></div><button class="dialog-close" id="closePins" aria-label="Zamknij">×</button></div><div id="pinsList" class="dialog-list"></div></dialog>
+
+  <dialog id="permissionsDialog" class="action-dialog"><div class="dialog-heading"><div><h2>Uprawnienia bota</h2><p id="permissionChannelName"></p></div><button class="dialog-close" id="closePermissions" aria-label="Zamknij">×</button></div><div id="permissionsList" class="permissions-list"></div><p class="dialog-note dialog-padding">Discord może dodatkowo odmówić moderacji, gdy najwyższa rola bota jest niżej od roli użytkownika.</p></dialog>
+
+  <dialog id="userDialog" class="action-dialog"><div id="userPanel"></div><div class="dialog-buttons dialog-padding"><button id="userDmButton" class="btn-secondary" type="button">Otwórz DM</button><button id="userTimeoutButton" class="btn-secondary" type="button">Timeout</button><button id="userKickButton" class="danger-button" type="button">Wyrzuć</button><button id="userBanButton" class="danger-button" type="button">Zbanuj</button><button id="closeUser" class="btn-secondary" type="button">Zamknij</button></div></dialog>
+
+  <dialog id="reactionDialog" class="action-dialog"><form id="reactionForm" method="dialog"><div class="dialog-heading"><div><h2>Reakcja</h2><p>Wpisz emoji Unicode lub niestandardowe emoji w formacie Discorda.</p></div><button class="dialog-close" value="cancel" aria-label="Zamknij">×</button></div><label for="reactionEmoji">EMOJI</label><input id="reactionEmoji" maxlength="100" placeholder="👍 lub &lt;:nazwa:ID&gt;" required /><div class="dialog-buttons"><button class="btn-secondary" value="cancel">Anuluj</button><button class="btn-primary dialog-primary" id="reactionSubmit" value="default">Dodaj reakcję</button></div></form></dialog>
+
+  <div id="contextMenu" class="context-menu" hidden role="menu"><button data-context-action="reply">↩ Odpowiedz</button><button data-context-action="react">☺ Dodaj reakcję</button><button data-context-action="pin">⌖ Przypnij/odepnij</button><button data-context-action="edit">✎ Edytuj</button><button data-context-action="select">☑ Zaznacz</button><button data-context-action="copy-text">⎘ Kopiuj treść</button><button data-context-action="copy-id">ID Kopiuj ID</button><button data-context-action="copy-link">⇗ Kopiuj link</button><button data-context-action="delete" class="danger-text">⌫ Usuń</button></div>
+</body>
+</html>
